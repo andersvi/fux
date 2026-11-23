@@ -1,4 +1,9 @@
 ;;;; Fux polyphonic first species.
+
+(in-package :fux)
+
+
+
 (defparameter *poly-penalties*
   '((:cross-below-bass . 1000000)
     (:augmented-interval . 1000000)
@@ -19,7 +24,6 @@
 ;;;; Two generated voices, first species. Companion to first-species.lisp.
 ;;;; C references: Check, OtherVoiceCheck, Look, SaveIndx, BestFitFirst.
 ;;;; Preserve the C rule checks; keep search state local and explicit.
-(in-package :fux)
 
 (defun chord-interval-class (difference)
   "C: AddInterval; classify pitch above the bass."
