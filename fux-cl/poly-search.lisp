@@ -62,14 +62,14 @@
                                   (member previous-diff '(0 5 7 12)))
                           (return))
                         (when (loop for other from 0 to 2
-                                    thereis (and (/= other voice)
-                                                 (= (mod (other-voice state i voice other) 12)
-                                                    11)))
+                                      thereis (and (/= other voice)
+                                                   (= (mod (other-voice state i voice other) 12)
+                                                      11)))
                           (return))
                         (when (member (- (pitch-at state (1- n) voice)
                                          (pitch-at state i voice)) '(1 3))
                           (incf (aref (aref state 3) i voice))))))
-  state)
+    state))
 
 (defun poly-lines-from-state (state)
   (loop with base = (aref state 0)
@@ -134,7 +134,7 @@ The default retains the CL search improvement policy."
                          (setf max-penalty
                                (bound (* best-penalty penalty-ratio))))))))))
       (visit-node 2 0)
-      (nreverse results)))))
+      (nreverse results))))
 
 (defun run-exs11 (&key (stream t) (reference nil))
   (generate-poly-first-species *exs01-cantus* '(57 62)
