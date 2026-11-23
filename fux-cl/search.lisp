@@ -34,7 +34,7 @@ CANTUS and START are absolute semitone pitches."
     state))
 
 (defun first-species-candidates (state note current-penalty best-penalty
-                                            crossing-policy)
+                                            crossing-policy &optional provenance)
   "C: Look plus SaveIndx (one voice). Return up to 16 (cost . interval-index)
 records, sorted by increasing cost, retaining original order for ties."
   (let ((previous (pitch-at state (1- note) 1))
@@ -47,6 +47,7 @@ records, sorted by increasing cost, retaining original order for ties."
                                            :crossing-policy crossing-policy)
           for cost = local
           do (set-pitch state note 1 pitch) ; C Look: SetUs after Check
+             (when provenance (setf (aref provenance note) nil))
              (when (< cost (- best-penalty current-penalty))
                (push (cons cost i) candidates)))
     (stable-sort (nreverse candidates) #'< :key #'car)))
@@ -83,29 +84,104 @@ The change is intentionally *not* undone by the search: C does not undo it."
         for i from 1 to (total-notes state 1)
         collect (+ base (pitch-at state i 1))))
 
+(defun %score-first-species-line (cantus pitches mode ficta-positions)
+  "Evaluate pitches sequentially; only listed notes bypass the mode gate."
+  (unless (= (length cantus) (length pitches))
+    (error "Cantus and counterpoint must have the same length"))
+  (let* ((state (make-first-species-cantus cantus (first pitches) mode))
+         (base (aref state 0))
+         (locals (list 0)))
+    (loop for pitch in (rest pitches)
+          for note from 2
+          for candidate = (- pitch base)
+          do (push (check-first-species state note candidate
+                                        :limit 10000000
+                                        :crossing-policy :candidate
+                                        :ficta-mode-exemption
+                                        (not (null (member note ficta-positions))))
+                   locals)
+             (set-pitch state note 1 candidate))
+    (setf locals (nreverse locals))
+    (values (reduce #'+ locals) locals)))
+
+(defun score-first-species-line (cantus pitches &key (mode :dorian))
+  "Fresh literal Check of an absolute-pitch first-species line.
+Return total and local penalties, with zero for the fixed first note.
+Evaluate against the installed prefix using candidate crossing; do not
+apply or exempt ficta. A large result is not a musical validity verdict."
+  (%score-first-species-line cantus pitches mode nil))
+
+(defun score-first-species-post-ficta (cantus raw notated
+                                      &key (mode :dorian) provenance)
+  "Recheck NOTATED with a narrow exemption for this save's proven ficta.
+RAW must reproduce NOTATED by one call to SaveResults' ficta pass.
+Return total, local penalties, and the one-based positions exempted from
+the ordinary mode gate. PROVENANCE is a list of (note before after) from
+the generator; earlier inherited alterations require that extra history.
+Other melodic and harmonic checks still use the notated pitches."
+  (unless (and (= (length cantus) (length raw))
+               (= (length raw) (length notated)))
+    (error "Cantus, raw and notated lines must have the same length"))
+  (let* ((state (make-first-species-cantus cantus (first raw) mode))
+         (base (aref state 0)))
+    (loop for pitch in (rest raw)
+          for note from 2
+          do (set-pitch state note 1 (- pitch base)))
+    (first-species-cadence-ficta state)
+    (unless (equal (line-from-state state) notated)
+      (error "Notated line does not follow from one SaveResults ficta pass"))
+    (let* ((raised (loop for before in raw for after in notated
+                         for note from 1
+                         unless (= before after) collect note))
+           (exemptions (copy-list raised)))
+      (dolist (entry provenance)
+        (unless (and (listp entry) (= (length entry) 3)
+                     (integerp (first entry))
+                     (<= 2 (first entry) (length raw))
+                     (integerp (second entry)) (integerp (third entry))
+                     (= (third entry) (1+ (second entry)))
+                     (= (nth (1- (first entry)) notated) (third entry))
+                     (or (member (first entry) raised)
+                         (= (nth (1- (first entry)) raw) (third entry))))
+          (error "Invalid ficta provenance: ~S" entry))
+        (pushnew (first entry) exemptions))
+      (setf exemptions (sort exemptions #'<))
+      (multiple-value-bind (total locals)
+          (%score-first-species-line cantus notated mode exemptions)
+        (values total locals exemptions)))))
+
 (defun generate-first-species (cantus start &key (mode :dorian)
                                              (stream nil)
                                              (branch-limit 1250)
                                              (integer-bounds nil)
                                              (terminal-bound :best-fit)
-                                             (crossing-policy :candidate))
+                                             (crossing-policy :candidate)
+                                             (save-state-policy :historic)
+                                             (result-format :legacy))
   "Port of C BestFitFirst/Look/SaveResults for one voice in first species.
 Returns a list of (penalty pitches) in the order improvements were found.
 STREAM may be T (standard output) or a stream to print C-style results.
 TERMINAL-BOUND is :BEST-FIT to accept any complete improvement, or
 :MAX-PENALTY to apply the historical search bound at the final note too.
 INTEGER-BOUNDS truncates each bound update; NIL retains exact rationals.
+SAVE-STATE-POLICY :RESTORE removes SaveResults' work-array mutation after
+the notated result is copied; :HISTORIC keeps it for later search branches.
 No recomputation of a global optimum is implied."
+  (unless (member result-format '(:legacy :with-ficta))
+    (error "Unknown result format: ~S" result-format))
   (unless (member crossing-policy '(:candidate :stored))
     (error "Unknown crossing policy: ~S" crossing-policy))
   (unless (member terminal-bound '(:best-fit :max-penalty))
     (error "Unknown terminal bound policy: ~S" terminal-bound))
+  (unless (member save-state-policy '(:historic :restore))
+    (error "Unknown save-state policy: ~S" save-state-policy))
   (let* ((state (make-first-species-cantus cantus start mode))
          (total (total-notes state 1))
          (best-penalty 1000000)
          (max-penalty 400)
          (penalty-ratio 99/100)
          (branches 0)
+         (provenance (make-array (1+ total) :initial-element nil))
          (results nil))
     ;; SAIL/C store MaxPenalty as an integer. Both switches are needed for
     ;; the tested C reference configuration (all ten one-voice EXS cases):
@@ -113,14 +189,48 @@ No recomputation of a global optimum is implied."
     ;;                         :terminal-bound :max-penalty)
     (labels ((bound (x) (if integer-bounds (truncate x) x))
              (save-result (cost)
-               (first-species-cadence-ficta state)
-               (setf best-penalty cost
-                     max-penalty (bound (min (* best-penalty penalty-ratio)
-                                             max-penalty)))
-               (let ((line (line-from-state state)))
-                 (push (list cost line) results)
+               (let* ((detailed (eq result-format :with-ficta))
+                      (raw (when (or detailed
+                                     (eq save-state-policy :restore))
+                            (line-from-state state))))
+                 (first-species-cadence-ficta state)
+                 (setf best-penalty cost
+                       max-penalty (bound (min (* best-penalty penalty-ratio)
+                                               max-penalty)))
+                 (let* ((line (line-from-state state))
+                        (changes (when raw
+                                   (loop for before in raw for after in line
+                                         for index from 1
+                                         unless (= before after)
+                                           collect (list index before after))))
+                        (notated-penalty nil)
+                        (notated-locals nil))
+                   (dolist (entry changes)
+                     (setf (aref provenance (first entry)) entry))
+                   (when detailed
+                     (multiple-value-setq (notated-penalty notated-locals)
+                       (score-first-species-line cantus line :mode mode)))
+                   (push (if detailed
+                             (list :search-penalty cost
+                                   :raw-pitches raw
+                                   :notated-pitches line
+                                   :ficta-changes changes
+                                   :ficta-provenance
+                                   (loop for note from 1 to total
+                                         when (aref provenance note)
+                                           collect (copy-list
+                                                    (aref provenance note)))
+                                   :notated-penalty notated-penalty
+                                   :notated-local-penalties notated-locals)
+                             (list cost line))
+                         results)
                  (when stream
-                   (format stream "~% [~D] ~{~D ~}~%" cost line))))
+                   (format stream "~% [~D] ~{~D ~}~%" cost line))
+                 (when (eq save-state-policy :restore)
+                   (loop for pitch in raw for note from 1
+                         do (set-pitch state note 1
+                                       (- pitch (aref state 0))))
+                   (fill provenance nil)))))
              (visit-node (note accumulated)
                ;; C: BestFitFirst, branch count and reset of MaxPenalty.
                (when (<= accumulated max-penalty)
@@ -130,7 +240,7 @@ No recomputation of a global optimum is implied."
                          branches 0))
                  (let ((options (first-species-candidates
                                  state note accumulated best-penalty
-                                 crossing-policy)))
+                                 crossing-policy provenance)))
                    (dolist (option options)
                      (let ((total-cost (+ accumulated (car option))))
                        ;; SAIL/C test CurTime, so MaxPenalty also applies
@@ -146,6 +256,7 @@ No recomputation of a global optimum is implied."
                          (set-pitch state note 1
                                     (+ (pitch-at state (1- note) 1)
                                        (aref *search-intervals* (cdr option))))
+                         (setf (aref provenance note) nil)
                          (if (< note total)
                              (visit-node (1+ note) total-cost)
                              (save-result total-cost)))

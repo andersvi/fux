@@ -3,7 +3,7 @@
 ;;;; It intentionally retains C's order of early cutoff tests.
 (in-package :fux)
 
-(defparameter *fux-penalties*
+(defparameter *first-species-penalties*
   '((:infinity . 1000000) (:bad . 100) (:real-bad . 200)
     (:out-of-range . 200) (:extreme-range . 5) (:cross-above-cantus . 1000000)
     (:out-of-mode . 1000000) (:bad-cadence . 1000000)
@@ -29,6 +29,16 @@
     (:repetition-upbeat . 100) (:lydian-cadential-tritone . 13)
     (:vertical-tritone . 2)))
 
+;; Other species and the polyphonic checks extend this catalogue at load
+;; time. Preserve those entries when first-species.lisp is reloaded during
+;; development, while refreshing the base values from this file.
+(defvar *fux-penalties* nil)
+(setf *fux-penalties*
+      (append (copy-list *first-species-penalties*)
+              (remove-if (lambda (entry)
+                           (assoc (car entry) *first-species-penalties*))
+                         *fux-penalties*)))
+
 (defun penalty (name)
   (let ((entry (assoc name *fux-penalties*)))
     (if entry (cdr entry) (error "Unknown penalty ~S" name))))
@@ -41,11 +51,14 @@
 
 (defun check-first-species (state note candidate &key (voice 1) (num-parts 1)
                                                    (limit 1000000)
-                                                   (crossing-policy :candidate))
+                                                   (crossing-policy :candidate)
+                                                   (ficta-mode-exemption nil))
   "C: Check for first species, two voices, in original rule order.
 STATE must have all cantus pitches, onset/duration and total-notes set.
 The result is the candidate's LOCAL penalty, not the cumulative score.
-Only VOICE=1, NUM-PARTS=1 are supported in this phase."
+Only VOICE=1, NUM-PARTS=1 are supported in this phase.
+FICTA-MODE-EXEMPTION bypasses only the ordinary non-cadential mode gate.
+It is for a separately verified SaveResults alteration, not search."
   (unless (member crossing-policy '(:candidate :stored))
     (error "Unknown crossing policy: ~S" crossing-policy))
   (unless (and (= voice 1) (= num-parts 1))
@@ -78,7 +91,8 @@ Only VOICE=1, NUM-PARTS=1 are supported in this phase."
         (add :cross-above-cantus))
       (cond
         ((not penultimate-p)
-         (unless (in-mode pitch mode) (add :out-of-mode)))
+         (unless (or ficta-mode-exemption (in-mode pitch mode))
+           (add :out-of-mode)))
         ((or (= pitch 11) (and (= pitch 10) (eq mode :phrygian)))
          (when (doubled-p state pitch note voice) (add :doubled-leading-tone)))
         ((= pitch 10) (add :bad-cadence))

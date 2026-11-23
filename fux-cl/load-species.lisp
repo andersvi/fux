@@ -19,13 +19,20 @@
 		))
   (load (compile-file file)))
 
-(dolist (file '("mixed-advanced-search.lisp"
-		"mixed-advanced-tests.lisp"
-		"mixed-fifth-species.lisp"
-		"mixed-fourth-species.lisp"
-		"mixed-third-species.lisp"
-		"mixed-voice-rules.lisp"
-		"counterpoint-rhythm.lisp"
-		"generate-counterpoint.lisp"))
+(dolist (file '("score-contract-audit.lisp"
+		"save-contract-tests.lisp"
+		"post-ficta-audit.lisp"))
+  (load (compile-file file)))
 
+
+
+(dolist (file '("mixed-voice-rules.lisp"
+                "mixed-third-species.lisp"
+                "mixed-fourth-species.lisp"
+                "mixed-fifth-species.lisp"
+                "mixed-advanced-search.lisp"
+                "mixed-advanced-tests.lisp"
+                "counterpoint-rhythm.lisp"
+                "generate-counterpoint.lisp"
+                "fux-rhythm-suite.lisp"))
   (load (compile-file file)))
