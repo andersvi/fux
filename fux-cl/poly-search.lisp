@@ -46,9 +46,9 @@
 
 (defun poly-first-species-cadence-ficta (state)
   "C: SaveResults for all generated voices. Historically mutates work state."
-  (let ((n (total-notes state 1))
-        (mode (aref state 1)))
+  (let ((mode (aref state 1)))
     (loop for voice from 1 to 2
+          for n = (total-notes state voice)
           do (unless (in-mode (mod (pitch-at state (1- n) voice) 12) mode)
                (loop for k from 2 below (1- n)
                      for i = (- n k)

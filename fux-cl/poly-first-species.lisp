@@ -103,8 +103,9 @@
 Returns the local penalty, preserving early cutoff order."
   (unless (member crossing-policy '(:candidate :stored))
     (error "Unknown crossing policy: ~S" crossing-policy))
-  (unless (and (= num-parts 2) (<= 1 voice 2))
-    (error "This evaluator requires two generated voices"))
+  (unless (and (integerp num-parts) (<= 2 num-parts 5)
+               (integerp voice) (<= 1 voice num-parts))
+    (error "Expected 2..5 generated voices and a voice within that range"))
   (let* ((other0 (if (= voice 1) (cantus state note voice)
                       (bass state note voice)))
          (other1 (if (= voice 1) (cantus state (1- note) voice)

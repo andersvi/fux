@@ -31,8 +31,12 @@
                 "mixed-fourth-species.lisp"
                 "mixed-fifth-species.lisp"
                 "mixed-advanced-search.lisp"
+                "many-voice-search.lisp"
                 "mixed-advanced-tests.lisp"
                 "counterpoint-rhythm.lisp"
                 "generate-counterpoint.lisp"
-                "fux-rhythm-suite.lisp"))
+                "many-voice-tests.lisp"
+                "fux-rhythm-suite.lisp"
+                "figure-16-8.lisp"
+                "figure-16-8-c-audit.lisp"))
   (load (compile-file file)))

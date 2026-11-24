@@ -5,26 +5,35 @@
 (defun generate-counterpoint (cantus &key (species 1) starts
                                       (mode :dorian) (stream nil)
                                       (reference nil)
-                                      (seed 1) patterns branch-limit with-rhythm)
-  "Generate counterpoint for CANTUS using one or two starting pitches.
-SPECIES is 1..5. With two STARTS, voice 1 uses species 1 and voice 2
-uses SPECIES. Return the existing improvement records: (COST VOICE...).
-REFERENCE selects the tested historical C search configuration. SEED and
-PATTERNS apply to species 5 only. BRANCH-LIMIT, when supplied, overrides
-the underlying generator's own default. WITH-RHYTHM T returns each
-improvement with pitches, onsets, durations and inferred ligatures."
+                                      (seed 1) patterns branch-limit with-rhythm
+                                      with-search-costs
+                                      inner-durations inner-half-notes)
+  "Generate counterpoint for CANTUS using one to five starting pitches.
+SPECIES is 1..5. All but the final generated voice use first-species
+rules. INNER-DURATIONS or INNER-HALF-NOTES select earlier voices' rhythms
+when there are three or more generated voices; they do not alter those
+voices' rules. Return improving (COST VOICE...) records. REFERENCE selects
+the tested C search settings. SEED and PATTERNS apply to species 5.
+WITH-RHYTHM T adds onsets, durations and inferred ligatures."
   (unless (and (listp cantus) (>= (length cantus) 2)
                (every #'integerp cantus))
     (error "CANTUS must be a list of at least two integer pitches: ~S" cantus))
   (unless (member species '(1 2 3 4 5))
     (error "SPECIES must be 1 through 5: ~S" species))
-  (unless (and (listp starts) (member (length starts) '(1 2))
+  (unless (and (listp starts) (<= 1 (length starts) 5)
                (every #'integerp starts))
-    (error "STARTS must contain one or two integer pitches: ~S" starts))
+    (error "STARTS must contain one to five integer pitches: ~S" starts))
   (unless (assoc mode *modes*)
     (error "Unknown mode: ~S" mode))
   (when (and (/= species 5) patterns)
     (error "PATTERNS applies to fifth species only"))
+  (when (and with-search-costs
+             (not (or (and (= species 5) (= (length starts) 1))
+                      (>= (length starts) 3))))
+    (error "WITH-SEARCH-COSTS supports one fifth-species voice or 3..5 generated voices"))
+  (when (and (< (length starts) 3)
+             (or inner-durations inner-half-notes))
+    (error "Inner-voice rhythms require at least three generated voices"))
   (when (and branch-limit (or (not (integerp branch-limit))
                              (not (plusp branch-limit))))
     (error "BRANCH-LIMIT must be a positive integer: ~S" branch-limit))
@@ -47,7 +56,17 @@ improvement with pitches, onsets, durations and inferred ligatures."
                         (3 #'generate-third-species)
                         (4 #'generate-fourth-species)
                         (5 #'generate-fifth-species))
-                      cantus (first starts) (append args crossing)))
+                      cantus (first starts)
+                      (append args crossing
+                              (when with-search-costs
+                                (list :with-search-costs t)))))
+              ((>= (length starts) 3)
+               (apply #'generate-many-voice-counterpoint
+                      cantus starts species
+                      (append args crossing
+                              (list :inner-durations inner-durations
+                                    :inner-half-notes inner-half-notes
+                                    :with-search-costs with-search-costs))))
               ((= species 1)
                ;; Historical poly search does not take CROSSING-POLICY.
                (apply #'generate-poly-first-species cantus starts args))
@@ -59,7 +78,9 @@ improvement with pitches, onsets, durations and inferred ligatures."
                       (append args crossing))))))
       (if with-rhythm
           (counterpoint-records-with-rhythm records cantus starts species
-                                            mode seed patterns)
+                                            mode seed patterns
+                                            :inner-durations inner-durations
+                                            :inner-half-notes inner-half-notes)
           records))))
 
 (defun best-counterpoint (records)

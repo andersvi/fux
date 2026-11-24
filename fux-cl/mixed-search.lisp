@@ -194,5 +194,22 @@ C's documented search-bound behavior."
     (assert (= (next-mixed-onset state 0) 4))
     (assert (= (next-mixed-onset state 4) 8))
     (assert (integerp (check-mixed-second-species state 2
-                                                  (pitch-at state 1 2))))
-    t))
+                                                  (pitch-at state 1 2)))))
+  ;; SaveResults must use each voice's own final index. In 1+2 the second
+  ;; voice has nine notes, while the first voice has only five.
+  (let ((state (make-mixed-second-species-state
+                *mixed-species2-short-cantus* '(57 62) :dorian)))
+    (loop for i from 2 to 5 do (set-pitch state i 1 55))
+    (loop for i from 2 to 9 do (set-pitch state i 2 55))
+    (set-pitch state 6 2 57)
+    (set-pitch state 7 2 58)
+    (set-pitch state 8 2 59) ; raised leading tone, outside Dorian
+    (set-pitch state 9 2 60)
+    (poly-first-species-cadence-ficta state)
+    (assert (= (pitch-at state 7 2) 59)))
+  ;; The old smoke test did not check its saved C reference records.
+  (assert (equal (run-mixed-species2 :case :short :reference t :stream nil)
+                 *mixed-species2-short-reference*))
+  (assert (equal (run-mixed-species2 :case :medium :reference t :stream nil)
+                 *mixed-species2-medium-reference*))
+  t)

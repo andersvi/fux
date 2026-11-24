@@ -27,8 +27,9 @@ The result is the candidate's LOCAL penalty, not the cumulative score.
 For the final generated voice (VOICE=2), above a first-species voice."
   (unless (member crossing-policy '(:candidate :stored))
     (error "Unknown crossing policy: ~S" crossing-policy))
-  (unless (and (= voice 2) (= num-parts 2))
-    (error "This mixed evaluator expects two generated voices"))
+  (unless (and (integerp num-parts) (<= 2 num-parts 5)
+               (eql voice num-parts))
+    (error "Second species must be the final voice among 2..5 generated voices"))
   (let* ((other0 (bass state note voice))
          (other1 (bass state (1- note) voice))
          (last-cp (pitch-at state (1- note) voice))
