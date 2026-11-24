@@ -1,0 +1,22 @@
+(in-package :cmn)
+;;; FUX-CL search with Figure 16.8 cantus, starts and rhythms.
+;;; Fingerings give the local penalties of this generated line.
+;;; Their sum is 5042; historical Figure 16.8 labels do not apply.
+
+(cmn (output-file "figure-16-8-search-output.eps") (size 16) (automatic-line-breaks nil)
+  (staff bar treble (meter 4 4 (meter-size 0))
+	 (d5 q (fingering 0)) (e5 q (fingering 1)) (f5 q (fingering 213)) (a5 e (fingering 13)) (g5 e (fingering 1)) (f5 h (fingering 105)) (a5 q (fingering 15)) (g5 q (fingering 5)) (f5 h (fingering 316)) (g5 h (fingering 3)) (a5 h (fingering 219)) (f5 q (fingering 15)) (d5 e (fingering 10)) (a5 e (fingering 119)) (c6 q (fingering 140)) (a5 e (fingering 16)) (b5 e (fingering 6)) (c6 q (fingering 115)) (b5 q (fingering 7)) (a5 q (fingering 219)) (d5 e (fingering 9)) (e5 e (fingering 1)) (f5 q (fingering 253)) (d5 e (fingering 10)) (e5 e (fingering 2)) (f5 h (fingering 318)) (g5 h (fingering 2)) (a5 q (fingering 221)) (e5 e (fingering 112)) (f5 e (fingering 4)) (g5 h (fingering 338)) (a5 h (fingering 31)) (a4 q (fingering 12)) (d5 e (fingering 19)) (a4 e (fingering 314)) (e5 h (fingering 114)) (g5 q (fingering 31)) (b5 e (fingering 25)) (cs6 e (fingering 220)) (d6 w (fingering 326)) bar)
+  
+  (staff bar treble (meter 4 4 (meter-size 0))
+    (a4 h (fingering 0)) (d5 h (fingering 17)) (c5 h (fingering 3)) (c4 h begin-tie (fingering 133)) (c4 h end-tie (fingering 17)) (a3 h begin-tie (fingering 13)) (a3 h end-tie (fingering 7)) (a4 h (fingering 11)) (e4 h (fingering 117)) (c4 h (fingering 21)) (d4 h (fingering 4)) (c4 h (fingering 32)) (a3 h (fingering 10)) (f4 h (fingering 19)) (e4 h (fingering 7)) (e5 h (fingering 9)) (d5 h (fingering 3)) (c5 h (fingering 8)) (g4 h (fingering 13)) (e4 h (fingering 109)) (a4 w (fingering 11)) bar)
+  
+  (staff bar treble (meter 4 4 (meter-size 0))
+    (d4 w) (f4 w) (e4 w) (d4 w) (g4 w) (f4 w) (a4 w) (g4 w) (f4 w) (e4 w) (d4 w) bar)
+  
+  (staff bar bass (meter 4 4 (meter-size 0))
+    (a3 h (fingering 0)) (f3 h (fingering 2)) (a3 h (fingering 11)) (f3 h (fingering 12)) (c3 h (fingering 8)) (c4 h (fingering 21)) (f4 h (fingering 122)) (d4 h (fingering 112)) (e4 h (fingering 2)) (e3 h (fingering 8)) (a3 h (fingering 13)) (f3 h (fingering 21)) (c3 h (fingering 10)) (d3 h (fingering 3)) (e3 h (fingering 2)) (c4 h (fingering 22)) (a3 h (fingering 5)) (c4 h (fingering 9)) (b3 h (fingering 1)) (b3 h (fingering 102)) (a3 w (fingering 7)) bar)
+  
+  (staff bar bass (meter 4 4 (meter-size 0))
+    (d3 w (fingering 0)) (a2 w (fingering 1)) (a2 w (fingering 6)) (f2 w (fingering 3)) (c2 w (fingering 13)) (f2 w (fingering 17)) (f2 w (fingering 5)) (c3 w (fingering 6)) (f3 w (fingering 20)) (g3 w (fingering 3)) (d3 w (fingering 11)) bar)
+  
+)

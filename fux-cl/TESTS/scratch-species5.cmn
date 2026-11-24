@@ -1,0 +1,10 @@
+(in-package :cmn)
+;;; FUX search penalty: 36
+;;; Note fingerings are search costs before ficta.
+;;; Ficta changes (note, raw, notated): ((12 60 61) (14 60 61))
+(cmn (output-file "scratch-species5.eps")
+  (staff bar treble (meter 4 4 (meter-size 0))
+    (a4 q (fingering 0)) (f4 q (fingering 0)) (g4 q (fingering 0)) (a4 q begin-tie (fingering 2)) (a4 q end-tie (fingering 1)) (d5 q (fingering 1)) (c5 h begin-tie (fingering 15)) (c5 h end-tie (fingering 0)) (b4 q (fingering 0)) (e5 e (fingering 0)) (d5 e (fingering 2)) (cs5 q (fingering 2)) (b4 q (fingering 2)) (cs5 q (fingering 2)) (b4 e (fingering 6)) (cs5 e (fingering 0)) (d5 w (fingering 3)) bar)
+  (staff bar treble (meter 4 4 (meter-size 0))
+    (d4 w) (f4 w) (g4 w) (e4 w) (d4 w) bar)
+)

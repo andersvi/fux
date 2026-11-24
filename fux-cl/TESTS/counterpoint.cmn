@@ -1,0 +1,10 @@
+(in-package :cmn)
+;;; FUX search penalty: 61
+(cmn (output-file "counterpoint.eps")
+  (staff bar treble (meter 4 4 (meter-size 0))
+    (d5 h (fingering 0)) (f5 h (fingering 3)) (d5 h (fingering 22)) (c5 h begin-tie (fingering 7)) (c5 h end-tie (fingering 2)) (b4 h begin-tie (fingering 12)) (b4 h end-tie (fingering 0)) (a4 h begin-tie (fingering 2)) (a4 w end-tie (fingering 4)) bar)
+  (staff bar treble (meter 4 4 (meter-size 0))
+    (a4 w (fingering 0)) (a4 w (fingering 0)) (e4 w (fingering 1)) (cs4 w (fingering 6)) (d4 w (fingering 2)) bar)
+  (staff bar treble (meter 4 4 (meter-size 0))
+    (d4 w) (f4 w) (g4 w) (e4 w) (d4 w) bar)
+)
