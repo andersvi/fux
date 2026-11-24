@@ -63,7 +63,9 @@
                                   for hit = (search "(fingering " cmn :start2 pos)
                                   while hit
                                   count hit
-                                  do (setf pos (1+ hit))))))))
-  t))
+                                  do (setf pos (1+ hit)))))))))
+  t)
 
 (export 'test-many-voice-search-cost-capture :fux)
+
+;; (fux:test-many-voice-search-cost-capture)
