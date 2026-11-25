@@ -1,0 +1,25 @@
+(in-package :fux)
+
+(defun run-cleanup-regression-tests (group)
+  "Run one group at a time; narrow stack failures to an individual test."
+  (ecase group
+    (:basic (run-regression-tests)
+            (run-first-species-save-contract-tests)
+            (test-exs11))
+    (:species (run-second-species-tests)
+              (run-third-species-tests)
+              (run-fourth-species-tests)
+              (run-fifth-species-tests)
+              (run-mixed-species2-tests))
+    (:mixed-full (run-mixed-advanced-tests :full t))
+    (:rhythm (run-generator-api-tests)
+             (run-generator-rhythm-tests)
+             (run-fux-rhythm-suite))
+    (:search-costs (test-fifth-search-cost-capture)
+                   (test-many-voice-search-cost-capture))
+    (:six-voices (test-six-voice-positive-c-reference))
+    (:many-voice-c (run-many-voice-c-tests))
+    (:figure (run-figure-16-8-c-audit)))
+  t)
+
+(export 'run-cleanup-regression-tests :fux)
