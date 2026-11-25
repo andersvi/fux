@@ -61,11 +61,8 @@ state may make the sum differ from the original search penalty."
                                           (crossing-policy :stored) note-costs)
   "Write a CMN form from one :WITH-RHYTHM T improvement RECORD.
 STAFF-ORDER lists zero-based indices into :VOICES, from top to bottom;
-default is reverse generator order. SCORE-NOTES :SEARCH uses captured
-candidate costs before cadential pitch changes; it requires
-:WITH-SEARCH-COSTS T during
-generation. SCORE-NOTES T literally rescores the notated line with MODE
-and CROSSING-POLICY; that can differ from the search cost after ficta.
+default is reverse generator order. SCORE-NOTES T rescoring the finished
+line with MODE and CROSSING-POLICY adds (fingering N) to generated notes.
 Alternatively NOTE-COSTS supplies lists parallel to :VOICES (NIL for
 the cantus). The search penalty is printed separately as a comment."
   (let* ((voices (getf record :voices))
@@ -78,34 +75,9 @@ the cantus). The search penalty is printed separately as a comment."
     (when (and score-notes note-costs)
       (error "Use SCORE-NOTES or NOTE-COSTS, not both"))
     (when score-notes
-      (setf note-costs
-            (if (eq score-notes :search)
-                (let* ((costs (getf record :search-local-costs))
-                       (per-voice (if (= (length voices) 2)
-                                      (list nil costs)
-                                      costs)))
-                  (unless (and per-voice
-                               (= (length per-voice) (length voices))
-                               (null (first per-voice))
-                               (loop for data in (rest voices)
-                                     for line in (rest per-voice)
-                                     always (and (listp line)
-                                                 (= (length line)
-                                                    (length (getf data :pitches)))
-                                                 (every #'numberp line)))
-                               (= (loop for line in (rest per-voice)
-                                        sum (reduce #'+ line))
-                                  (getf record :penalty)))
-                    (error "CMN writer: missing or inconsistent captured search costs"))
-                  per-voice)
-                (counterpoint-cmn-note-costs record mode crossing-policy))))
+      (setf note-costs (counterpoint-cmn-note-costs record mode crossing-policy)))
     (format stream "(in-package :cmn)~%;;; FUX search penalty: ~D~%"
             (getf record :penalty))
-    (when (eq score-notes :search)
-      (format stream ";;; Note fingerings are search costs before cadential pitch changes.~%")
-      (when (getf record :ficta-changes)
-        (format stream ";;; Cadential pitch changes (one voice: note/raw/notated; multiple voices: voice/note/raw/notated): ~S~%"
-                (getf record :ficta-changes))))
     (format stream "(cmn (output-file ~S) (size ~D) ~%" output-file size)
     (dolist (index order)
       (let* ((voice (nth index voices))
@@ -144,16 +116,6 @@ the cantus). The search penalty is printed separately as a comment."
 ;;;     (fux:write-counterpoint-cmn best :stream s
 ;;;                                 :staff-order '(4 3 0 2 1)
 ;;;                                 :score-notes t :mode :dorian)))
-;;;
-;;; For *search* costs (currently one generated fifth-species voice):
-;;; (let* ((records (fux:generate-counterpoint '(50 53 55 52 50)
-;;;                     :starts '(57) :species 5 :patterns '(3 4 7 9)
-;;;                     :reference t :with-rhythm t :with-search-costs t))
-;;;        (best (fux:best-counterpoint records)))
-;;;   (with-open-file (s "fifth-search-costs.cmn" :direction :output
-;;;                      :if-exists :supersede)
-;;;     (fux:write-counterpoint-cmn best :stream s
-;;;                                 :score-notes :search)))
 ;;;
 ;;; Other small examples (the writer accepts the final record from each):
 ;;; (fux:best-counterpoint

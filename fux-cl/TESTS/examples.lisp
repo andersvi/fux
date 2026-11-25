@@ -146,7 +146,7 @@
 					:mode :lydian
 					:reference t
 					:with-rhythm t)
-	     "TESTS/scratch-six-voices-mixed-lydian"
+	     "scratch-six-voices-mixed-lydian"
 	     :mode :lydian
 	     :staff-order '(5 4 3 2 1 0))
 
@@ -158,7 +158,7 @@
 
 
 
-(scratch-cmn (fux:generate-counterpoint '(53 55 57 59 53 52 50 52 53)   ; F4 G4 A4 B4 F4 E4 D4 E4 F4
+(time (scratch-cmn (fux:generate-counterpoint '(53 55 57 59 53 52 50 52 53)   ; F4 G4 A4 B4 F4 E4 D4 E4 F4
 					:starts '(41 48 57 60 65 ) ; F3 C4 A4 C5 F5
 					:species 5
 					:mode :lydian
@@ -167,6 +167,6 @@
 					:reference t
 					:with-search-costs t
 					:with-rhythm t)
-	     "TESTS/scratch-six-voices-mixed-lydian-longer"
+	     "scratch-six-voices-mixed-lydian-longer"
 	     :mode :lydian
-	     :staff-order '(5 4 3 0 2 1))
+	     :staff-order '(5 4 3 0 2 1)))
