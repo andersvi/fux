@@ -47,7 +47,7 @@ def strip_line_comments(source):
 def build():
     sections = [";;;; FUX Common Lisp counterpoint generator.\n"
                 ";;;; Generated from src/ by tools/build.py; edit src/ instead.\n"
-                ";;;; You can find some examples at the bottom of this file.\n"
+                ";;;; See examples/ for interactive examples.\n"
                 ";;;; Sources: Bill Schottstaedt, Automatic Species Counterpoint,\n"
                 ";;;; CCRMA report STAN-M-19 (1984); Automatic Counterpoint,\n"
                 ";;;; in Current Directions in Computer Music Research, pp. 199-214\n"
@@ -61,11 +61,6 @@ def build():
         if not heading.startswith(";;;; "):
             raise ValueError(f"Missing source heading in {path}")
         sections.append(heading + "\n" + strip_line_comments(source))
-    example_source = (ROOT / "examples/examples.lisp").read_text()
-    if example_source.count("#|") != 1 or example_source.count("|#") != 1:
-        raise ValueError("Expected one inactive example block")
-    sections.append(example_source[example_source.index("#|"):
-                                   example_source.index("|#") + 2])
     content = "\n\n".join(sections).rstrip() + "\n"
     if re.search(r"\(assert\s|\(defun\s+(?:test-|run-.*-tests|compare-)", content):
         raise ValueError("A test or ASSERT reached the single-file build")
@@ -81,6 +76,7 @@ def build():
             ("README.md", ROOT / "PUBLIC-README.md"),
             ("examples/README.md", ROOT / "examples/README.md"),
             ("examples/examples.lisp", ROOT / "examples/examples.lisp"),
+            ("examples/scratch-cmn.lisp", ROOT / "examples/scratch-cmn.lisp"),
         ]:
             info = ZipInfo(arcname, (2026, 11, 24, 0, 0, 0))
             info.compress_type = ZIP_DEFLATED

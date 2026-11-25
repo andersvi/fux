@@ -11,4 +11,4 @@
                   "mixed-fourth-species" "mixed-fifth-species"
                   "mixed-advanced-search" "many-voice-search"
                   "counterpoint-rhythm" "generate-counterpoint" "fux-cmn"))
-    (load (merge-pathnames (format nil "src/~A.lisp" name) root))))
+    (load (compile-file (merge-pathnames (format nil "src/~A.lisp" name) root)))))

@@ -1,6 +1,6 @@
 ;;;; FUX Common Lisp counterpoint generator.
 ;;;; Generated from src/ by tools/build.py; edit src/ instead.
-;;;; You can find some examples at the bottom of this file.
+;;;; See examples/ for interactive examples.
 ;;;; Sources: Bill Schottstaedt, Automatic Species Counterpoint,
 ;;;; CCRMA report STAN-M-19 (1984); Automatic Counterpoint,
 ;;;; in Current Directions in Computer Music Research, pp. 199-214
@@ -4694,7 +4694,8 @@ state may make the sum differ from the original search penalty."
                                                  species 10000000 crossing-policy)))))))))
 
 (defun write-counterpoint-cmn (record &key (stream *standard-output*)
-                                          (output-file "counterpoint.eps")
+                                          title
+					  (output-file "counterpoint.eps")
 					  (size 20)
                                           staff-order (score-notes nil)
                                           (mode :dorian)
@@ -4746,7 +4747,7 @@ the cantus). The search penalty is printed separately as a comment."
       (when (getf record :ficta-changes)
         (format stream ";;; Cadential pitch changes (one voice: note/raw/notated; multiple voices: voice/note/raw/notated): ~S~%"
                 (getf record :ficta-changes))))
-    (format stream "(cmn (output-file ~S) (size ~D) ~%" output-file size)
+    (format stream "(cmn (output-file ~S) (size ~D) (title ~S) ~%" output-file size title)
     (dolist (index order)
       (let* ((voice (nth index voices))
              (pitches (getf voice :pitches))
@@ -4770,29 +4771,3 @@ the cantus). The search penalty is printed separately as a comment."
     record))
 
 (export 'write-counterpoint-cmn :fux)
-
-
-#|
-Interactive examples (evaluate individual forms after loading fux.lisp):
-
-(fux:best-counterpoint
- (fux:generate-counterpoint '(50 53 55 52 50)
-                            :starts '(57) :species 5
-                            :patterns '(3 4 7 9)
-                            :with-rhythm t :with-search-costs t))
-
-;; Six voices in Lydian mode, with per-note search costs.
-(defparameter *lydian-example*
-  (fux:best-counterpoint
-   (fux:generate-counterpoint '(53 55 57 59 53 52 50 52 53)
-                              :starts '(41 48 57 60 65)
-                              :species 5 :mode :lydian
-                              :patterns '(2 3 4 5 6 7 8 9)
-                              :inner-half-notes t :reference t
-                              :with-rhythm t :with-search-costs t)))
-
-(with-open-file (out "lydian.cmn" :direction :output :if-exists :supersede)
-  (fux:write-counterpoint-cmn *lydian-example* :stream out
-                              :mode :lydian :score-notes :search
-                              :staff-order '(5 4 3 0 2 1)))
-|#
