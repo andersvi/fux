@@ -30,3 +30,9 @@ Run these after `(load (compile-file "fux.lisp"))` or after loading `load-dev.li
 `examples.lisp` contains an optional REPL macro that writes its generating
 call into the CMN file, plus inactive example forms. Loading it never runs
 the examples. The stand-alone file repeats only the inactive forms at its end.
+
+Some examples - pdf, sound (ogg), mscore (.mscx, mscz) are part of the
+release:
+
+[Musical examples – scores and audio](https://github.com/andersvi/fux/releases/tag/examples)
+
