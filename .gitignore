@@ -2,3 +2,8 @@
 *~
 *.pdf
 *.zip
+*.mscz
+*.mscx
+*.ogg
+examples/LY/
+*.midi
