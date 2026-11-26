@@ -1,3 +1,10 @@
+## Download
+
+- [fux.lisp](https://github.com/andersvi/fux/releases/latest/download/fux.lisp)
+- [Complete distribution (ZIP)](https://github.com/andersvi/fux/releases/latest/download/fux-public.zip)
+- [Musical examples – scores and audio](https://github.com/andersvi/fux/releases/tag/examples)
+
+
 # Small interactive examples
 
 Run these after `(load (compile-file "fux.lisp"))` or after loading `load-dev.lisp`.
@@ -27,9 +34,13 @@ Run these after `(load (compile-file "fux.lisp"))` or after loading `load-dev.li
                               :staff-order '(5 4 3 0 2 1)))
 ```
 
-`examples.lisp` contains an optional REPL macro that writes its generating
-call into the CMN file, plus inactive example forms. Loading it never runs
-the examples. The stand-alone file repeats only the inactive forms at its end.
+`examples.lisp` contains an optional macro `scratch-cmn` that writes
+its generating call into the CMN file, plus inactive example
+forms. Loading it never runs the examples. The stand-alone file
+repeats only the inactive forms at its end.
+
+Evaluate selected forms from `examples.lisp` interactively; do not load
+the entire file. Examples are not embedded in the stand-alone build.
 
 Some examples - pdf, sound (ogg), mscore (.mscx, mscz) are part of the
 release:

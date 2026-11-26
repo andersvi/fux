@@ -73,7 +73,7 @@ def build():
     with ZipFile(zip_path, "w", ZIP_DEFLATED) as archive:
         for arcname, path in [
             ("fux.lisp", dist / "fux.lisp"),
-            ("README.md", ROOT / "PUBLIC-README.md"),
+            ("README.md", ROOT / "README.md"),
             ("examples/README.md", ROOT / "examples/README.md"),
             ("examples/examples.lisp", ROOT / "examples/examples.lisp"),
             ("examples/scratch-cmn.lisp", ROOT / "examples/scratch-cmn.lisp"),
