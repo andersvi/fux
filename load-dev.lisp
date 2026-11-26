@@ -1,4 +1,7 @@
-;;;; Load editable FUX modules from this directory, independent of cwd.
+;;;;
+;;;; Compile and load editable FUX modules
+;;;;
+
 (let ((root (make-pathname :name nil :type nil :defaults *load-truename*)))
   (dolist (name '("core" "first-species" "search"
                   "poly-first-species" "poly-search"

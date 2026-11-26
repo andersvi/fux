@@ -1,9 +1,11 @@
 # Historical reference notes
 
-The implementation follows Schottstaedt's *Automatic Species Counterpoint*
-and the later chapter presentation, using the archived C translation as an
-executable reference. The public `fux.lisp` contains the rule and search
-implementation; all C result lists and historical analysis are kept here.
+The implementation follows Schottstaedt's original SAIL implementation
+presented in *Automatic Species Counterpoint* and the later chapter
+presentation, using the archived C translation as an executable
+reference. The public `fux.lisp` contains the rule and search
+implementation; all C result lists and historical analysis are kept
+here.
 
 - `:reference t` selects the tested C-like search configuration (integer
   bounds, maximum-penalty final bound and stored-pitch crossing checks).
@@ -31,11 +33,5 @@ Keep your own copies in `reference/papers/` if you want an offline archive:
   (`Schottstaedt_Automatic-Counterpoint.pdf`).
 - William Schottstaedt, “Automatic Counterpoint,” chapter 16, pp. 199–214,
   in Max V. Mathews and John R. Pierce (eds.), *Current Directions in
-  Computer Music Research*, MIT Press, 1989. The 16-page scan was supplied
-  under the misleading filename `Schottstaedt - A Compouter Music Language -
-  scan 2026-11-10.pdf`; the chapter itself is “Automatic Counterpoint.”
+  Computer Music Research*, MIT Press, 1989.
 
-The exact C source used by the fixtures **is** included as `reference/fux.c`.
-When discussing a discrepancy, cite the particular C fragment or page and
-include a small reproducible example. We have not attached unverified
-third-party links to the two scans.
