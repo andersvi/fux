@@ -2,6 +2,8 @@
 *~
 *.pdf
 *.zip
+# but include the release zip:
+!fux-public.zip
 *.mscz
 *.mscx
 *.ogg
