@@ -74,6 +74,7 @@ def build():
         for arcname, path in [
             ("fux.lisp", dist / "fux.lisp"),
             ("README.md", ROOT / "README.md"),
+            ("LICENSE", ROOT / "LICENSE"),
             ("examples/README.md", ROOT / "examples/README.md"),
             ("examples/examples.lisp", ROOT / "examples/examples.lisp"),
             ("examples/scratch-cmn.lisp", ROOT / "examples/scratch-cmn.lisp"),

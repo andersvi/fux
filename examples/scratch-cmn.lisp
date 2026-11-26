@@ -1,5 +1,13 @@
 (in-package :fux)
 
+;;
+;; generates output to cmn - Common Music Notation - files.
+;; 
+;; Get cmn here: https://ccrma.stanford.edu/software/cmn/
+;; 
+
+
+
 (defmacro scratch-cmn (&whole whole generator-form name
                        &key
 			 (mode :dorian) staff-order
