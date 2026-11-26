@@ -1,3 +1,12 @@
+# Licensing
+
+The Common Lisp port and subsequent extensions are released under the
+MIT License.
+
+The original 'fux' counterpoint program by Bill Schottstaedt (1984,
+translated to C in 1995) is included and adapted with his permission,
+confirmed on November 26, 2026.
+
 # Historical reference notes
 
 The implementation follows Schottstaedt's original SAIL implementation
