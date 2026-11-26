@@ -1,3 +1,10 @@
+## Download
+
+- [fux.lisp](https://github.com/andersvi/fux/releases/latest/download/fux.lisp)
+- [Complete distribution (ZIP)](https://github.com/andersvi/fux/releases/latest/download/fux-public.zip)
+- [Musical examples – scores and audio](https://github.com/andersvi/fux/releases/tag/examples)
+
+
 # Small interactive examples
 
 Run these after `(load (compile-file "fux.lisp"))` or after loading `load-dev.lisp`.
@@ -30,3 +37,4 @@ Run these after `(load (compile-file "fux.lisp"))` or after loading `load-dev.li
 Load `scratch-cmn.lisp` after FUX to define the optional CMN macro.
 Evaluate selected forms from `examples.lisp` interactively; do not load
 the entire file. Examples are not embedded in the stand-alone build.
+
